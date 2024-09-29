@@ -59,6 +59,36 @@ app.get('/user/:id', authenticateJWT, async (req, res) => {
     }
 });
 
+// Rota para acessar indicadores de OEE de todas as máquinas
+app.get('/indicadores/oee', authenticateJWT, async (req, res) => {
+    try {
+        const response = await axios.get(`${process.env.INDICADORES_SERVICE_URL}/indicadores/oee`);
+        res.json(response.data);
+    } catch (error) {
+        res.status(error.response?.status || 500).json({ message: 'Erro ao acessar os indicadores de OEE.' });
+    }
+});
+
+// Rota para acessar indicadores de OEE de uma máquina específica
+app.get('/indicadores/oee/:maquina', authenticateJWT, async (req, res) => {
+    try {
+        const response = await axios.get(`${process.env.INDICADORES_SERVICE_URL}/indicadores/oee/${req.params.maquina}`);
+        res.json(response.data);
+    } catch (error) {
+        res.status(error.response?.status || 500).json({ message: 'Erro ao acessar o OEE da máquina.' });
+    }
+});
+
+// Rota para acessar indicadores de operadores
+app.get('/indicadores/operadores', authenticateJWT, async (req, res) => {
+    try {
+        const response = await axios.get(`${process.env.INDICADORES_SERVICE_URL}/indicadores/operadores`);
+        res.json(response.data);
+    } catch (error) {
+        res.status(error.response?.status || 500).json({ message: 'Erro ao acessar o OEE dos operadores.' });
+    }
+});
+
 app.listen(3000, () => {
     console.log('API Gateway rodando na porta 3000');
 });
