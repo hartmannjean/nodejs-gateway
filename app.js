@@ -3,9 +3,11 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // Middleware para autenticar o JWT (somente para rotas privadas)
 const authenticateJWT = (req, res, next) => {
@@ -92,6 +94,26 @@ app.get('/indicadores/oeegeral', authenticateJWT, async (req, res) => {
     }
 });
 
+// Rota para acessar indicadores de OEE de todas as máquinas com atributos separados
+app.get('/indicadores/separados/maquinas', authenticateJWT, async (req, res) => {
+    try {
+        const response = await axios.get(`${process.env.INDICADORES_SERVICE_URL}/indicadores/separados/maquinas`);
+        res.json(response.data);
+    } catch (error) {
+        res.status(error.response?.status || 500).json({ message: 'Erro ao acessar os indicadores de OEE.' });
+    }
+});
+
+// Rota para acessar indicadores OEE geral de todas as máquinas
+app.get('/indicadores/oeegeral/maquinas', authenticateJWT, async (req, res) => {
+    try {
+        const response = await axios.get(`${process.env.INDICADORES_SERVICE_URL}/indicadores/oeegeral/maquinas`);
+        res.json(response.data);
+    } catch (error) {
+        res.status(error.response?.status || 500).json({ message: 'Erro ao acessar os indicadores de OEE.' });
+    }
+});
+
 // Rota para acessar indicadores de OEE de uma máquina específica
 app.get('/indicadores/oee/:maquina', authenticateJWT, async (req, res) => {
     try {
@@ -99,16 +121,6 @@ app.get('/indicadores/oee/:maquina', authenticateJWT, async (req, res) => {
         res.json(response.data);
     } catch (error) {
         res.status(error.response?.status || 500).json({ message: 'Erro ao acessar o OEE da máquina.' });
-    }
-});
-
-// Rota para acessar indicadores de OEE de todas as máquinas
-app.get('/indicadores/oeegeral', authenticateJWT, async (req, res) => {
-    try {
-        const response = await axios.get(`${process.env.INDICADORES_SERVICE_URL}/indicadores/oeegeral`);
-        res.json(response.data);
-    } catch (error) {
-        res.status(error.response?.status || 500).json({ message: 'Erro ao acessar os indicadores de OEE.' });
     }
 });
 
